@@ -11,7 +11,8 @@
       "tsconfigPaths": true
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-asset"
     ],
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -25,7 +26,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.movie.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
