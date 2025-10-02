@@ -40,45 +40,72 @@ interface TabIconProps {
 const TabIcon = React.memo(({ focused, icon, title }: TabIconProps) => {
   if (focused) {
     return (
-      <View 
-        className="flex-row items-center justify-center px-6 py-3 rounded-full min-w-24"
-        style={{
-          backgroundColor: '#AB8BFF',
-          height: '100%',
-          width: '100%',
-          shadowColor: '#AB8BFF',
-          shadowOffset: { width: 0, height: 6 },
-          shadowOpacity: 0.4,
-          shadowRadius: 12,
-          elevation: 8,
-        }}
-      >
-        <Image 
-          source={icon} 
-          tintColor="#FFFFFF" 
-          className="w-5 h-5"
-          resizeMode="contain"
-        />
-        <Text 
-          className="text-white text-sm font-bold ml-2" 
-          numberOfLines={1}
-          style={{ fontSize: 12, letterSpacing: 0.5 }}
+      <View style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+      }}>
+        <View 
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#AB8BFF',
+            borderRadius: 20,
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+            minWidth: 80,
+            shadowColor: '#AB8BFF',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
+          }}
         >
-          {title}
-        </Text>
+          <Image 
+            source={icon} 
+            style={{
+              width: 20,
+              height: 20,
+              tintColor: '#FFFFFF'
+            }}
+            resizeMode="contain"
+          />
+          <Text 
+            style={{
+              color: '#FFFFFF',
+              fontSize: 12,
+              fontWeight: '600',
+              marginLeft: 6,
+              letterSpacing: 0.5
+            }}
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
+        </View>
       </View>
     );
   }
 
   // Non-focused state - clean minimal design
   return (
-    <View className="items-center justify-center py-3 px-2">
+    <View style={{
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+      height: '100%',
+    }}>
       <Image 
         source={icon} 
-        tintColor="#6B7280" 
-        className="w-6 h-6"
+        style={{
+          width: 24,
+          height: 24,
+          tintColor: '#9CA3AF',
+          opacity: 0.7
+        }}
         resizeMode="contain"
-        style={{ opacity: 0.8 }}
       />
     </View>
   );
@@ -91,34 +118,34 @@ const TabLayout = () => {
       screenOptions={{
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#AB8BFF",
-        tabBarInactiveTintColor: "#A8B5DB",
+        tabBarInactiveTintColor: "#9CA3AF",
         tabBarItemStyle: {
-          flex: 1,
-          height: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingVertical: 4,
-          paddingHorizontal: 2,
+          height: 70,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: 0,
+          paddingHorizontal: 0,
+          marginTop: 10,
         },
         tabBarStyle: {
-          backgroundColor: "rgba(15, 13, 35, 0.9)",
-          borderRadius: 32,
-          marginHorizontal: 20,
-          marginBottom: 34,
-          height: 72,
-          position: "absolute",
-          paddingHorizontal: 12,
-          paddingVertical: 8,
+          backgroundColor: '#0F0D23',
+          borderRadius: 35,
+          marginHorizontal: 16,
+          marginBottom: 60,
+          height: 60,
+          position: 'absolute',
+          paddingHorizontal: 4,
+          paddingVertical: 0,
           borderWidth: 1,
-          borderColor: "rgba(255, 255, 255, 0.1)",
-          shadowColor: "#000000",
+          borderColor: 'rgba(171, 139, 255, 0.2)',
+          shadowColor: '#000000',
           shadowOffset: {
             width: 0,
-            height: 16,
+            height: 12,
           },
-          shadowOpacity: 0.6,
-          shadowRadius: 20,
-          elevation: 25,
+          shadowOpacity: 0.5,
+          shadowRadius: 16,
+          elevation: 20,
         },
         headerShown: false,
       }}

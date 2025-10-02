@@ -3,6 +3,7 @@
     "name": "movies",
     "slug": "movies",
     "version": "1.0.0",
+    "scheme": "movies",
     
 
     "web": {
@@ -13,7 +14,7 @@
       "tsconfigPaths": true
     },
 
-    "plugins": [],
+    "plugins": ["expo-router"],
 
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
