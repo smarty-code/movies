@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchMovieDetails } from "services/api";
+import { fetchMovieDetailsCached } from "services/cachedApi";
 import { updateMovieViewCount, getMovieViewCount } from "services/appwrite";
 import useFetch from "services/usefetch";
 import { icons } from "constants/icons";
@@ -35,7 +35,7 @@ const Details = () => {
   const [viewCount, setViewCount] = useState<number>(0);
 
   const { data: movie, loading } = useFetch(() =>
-    fetchMovieDetails(id as string)
+    fetchMovieDetailsCached(id as string)
   );
 
   // Update view count when movie loads and fetch current count

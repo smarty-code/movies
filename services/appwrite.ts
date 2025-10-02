@@ -1,4 +1,5 @@
 import { Client, Databases, ID, Query } from "react-native-appwrite";
+import { fetchWithCache, CACHE_KEYS, CACHE_DURATION, removeCachedData } from './cacheService';
 
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!;
 const COLLECTION_ID = process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID!;
@@ -12,6 +13,7 @@ const database = new Databases(client);
 /**
  * Updates the view count for a movie when a user visits the movie details page
  * This tracks popularity based on how many times users view each movie
+ * Also invalidates the trending movies cache
  */
 export const updateMovieViewCount = async (movie: Movie) => {
   try {
@@ -47,6 +49,9 @@ export const updateMovieViewCount = async (movie: Movie) => {
       });
       console.log(`✅ Created new entry for: ${movie.title} (1 view)`);
     }
+    
+    // Invalidate trending movies cache since view counts changed
+    await removeCachedData(CACHE_KEYS.TRENDING);
   } catch (error) {
     console.error("❌ Error updating movie view count:", error);
     // Don't throw error to prevent blocking the UI
@@ -86,21 +91,31 @@ export const getMovieViewCount = async (movieId: number): Promise<number> => {
 /**
  * Gets the most popular movies based on view count
  * Returns top 5 movies ordered by view count (descending)
+ * Uses caching to reduce database calls
  */
-export const getTrendingMovies = async (): Promise<
-  TrendingMovie[] | undefined
-> => {
-  try {
-    const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
-      Query.limit(5),
-      Query.orderDesc("count"),
-    ]);
+export const getTrendingMovies = async (
+  forceRefresh: boolean = false
+): Promise<TrendingMovie[] | undefined> => {
+  const fetchTrending = async (): Promise<TrendingMovie[] | undefined> => {
+    try {
+      const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
+        Query.limit(5),
+        Query.orderDesc("count"),
+      ]);
 
-    console.log(`📊 Fetched ${result.documents.length} trending movies`);
-    
-    return result.documents as unknown as TrendingMovie[];
-  } catch (error) {
-    console.error("❌ Error fetching trending movies:", error);
-    return undefined;
-  }
+      console.log(`📊 Fetched ${result.documents.length} trending movies from database`);
+      
+      return result.documents as unknown as TrendingMovie[];
+    } catch (error) {
+      console.error("❌ Error fetching trending movies:", error);
+      return undefined;
+    }
+  };
+
+  return fetchWithCache(
+    CACHE_KEYS.TRENDING,
+    fetchTrending,
+    CACHE_DURATION.TRENDING,
+    forceRefresh
+  );
 };

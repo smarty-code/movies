@@ -11,7 +11,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { images } from 'constants/images';
 import { icons } from 'constants/icons';
 import useFetch from 'services/usefetch';
-import { fetchMovies } from 'services/api';
+import { fetchMoviesCached } from 'services/cachedApi';
 import SearchBar from 'components/SearchBar';
 import { getTrendingMovies } from 'services/appwrite';
 import TrendingCard from 'components/TrendingCard';
@@ -33,7 +33,7 @@ const Index = () => {
     data: movies,
     loading: moviesLoading,
     error: moviesError,
-  } = useFetch(() => fetchMovies({ query: '' }));
+  } = useFetch(() => fetchMoviesCached(''));
 
   // Refresh trending movies when the screen comes into focus (but not on initial load)
   useFocusEffect(
@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 40,
+    marginTop: 18,
   },
   sectionTitle: {
     fontSize: 18,

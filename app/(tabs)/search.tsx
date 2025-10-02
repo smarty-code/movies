@@ -4,7 +4,7 @@ import { icons } from "constants/icons";
 import { images } from "constants/images";
 import React, { useState, useEffect } from "react";
 import { View, Text, ActivityIndicator, FlatList, Image, StyleSheet } from "react-native";
-import { fetchMovies } from "services/api";
+import { fetchMoviesCached } from "services/cachedApi";
 import { updateSearchCount } from "services/appwrite";
 import useFetch from "services/usefetch";
 
@@ -17,7 +17,7 @@ const Search = () => {
     error,
     refetch: loadMovies,
     reset,
-  } = useFetch(() => fetchMovies({ query: searchQuery }), false);
+  } = useFetch(() => fetchMoviesCached(searchQuery), false);
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
