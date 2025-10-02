@@ -1,9 +1,8 @@
-import bg from "./../../movies/assets/images/bg.png";
-import highlight from "./../../movies/assets/images/highlight.png";
-import rankingGradient from "./../../movies/assets/images/rankingGradient.png";
+
 
 export const images = {
-  bg,
-  highlight,
-  rankingGradient,
+  bg: require('./../assets/images/bg.png'),
+  highlight: require('./../assets/images/highlight.png'),
+  rankingGradient: require('./../assets/images/rankingGradient.png'),
 };
+  

@@ -1,19 +1,12 @@
-import home from "./../../movies/assets/icons/home.png";
-import search from "./../../movies/assets/icons/search.png";
-import person from "./../../movies/assets/icons/person.png";
-import logo from "./../../movies/assets/icons/logo.png";
-import save from "./../../movies/assets/icons/save.png";
-import star from "./../../movies/assets/icons/star.png";
-import play from "./../../movies/assets/icons/play.png";
-import arrow from "./../../movies/assets/icons/arrow.png";
+
 
 export const icons = {
-  home,
-  search,
-  person,
-  logo,
-  save,
-  star,
-  play,
-  arrow,
+  home : require('./../assets/icons/home.png'),
+  search : require('./../assets/icons/search.png'),
+  person : require('./../assets/icons/person.png'),
+  logo : require('./../assets/icons/logo.png'),
+  save : require('./../assets/icons/save.png'),
+  star : require('./../assets/icons/star.png'),
+  play : require('./../assets/icons/play.png'),
+  arrow : require('./../assets/icons/arrow.png'),
 };
