@@ -6,11 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchMovieDetailsCached } from "services/cachedApi";
-import { updateMovieViewCount, getMovieViewCount } from "services/appwrite";
+import { updateMovieViewCount, getMovieViewCount, saveMovie, unsaveMovie, isMovieSaved } from "services/appwrite";
 import useFetch from "services/usefetch";
 import { icons } from "constants/icons";
 import { useEffect, useState } from "react";
@@ -33,12 +34,14 @@ const Details = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const [viewCount, setViewCount] = useState<number>(0);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const { data: movie, loading } = useFetch(() =>
     fetchMovieDetailsCached(id as string)
   );
 
-  // Update view count when movie loads and fetch current count
+  // Update view count and check save status when movie loads
   useEffect(() => {
     if (movie) {
       // Update the view count in database
@@ -55,8 +58,37 @@ const Details = () => {
         setViewCount(count);
         console.log(`👁️ View count for "${movie.title}": ${count}`);
       });
+
+      // Check if movie is saved
+      isMovieSaved(movie.id).then((saved) => {
+        setIsSaved(saved);
+      });
     }
   }, [movie]);
+
+  const handleSaveToggle = async () => {
+    if (!movie || isSaving) return;
+
+    setIsSaving(true);
+    try {
+      if (isSaved) {
+        // Unsave the movie
+        await unsaveMovie(movie.id);
+        setIsSaved(false);
+        Alert.alert('Removed', `${movie.title} removed from your watchlist`);
+      } else {
+        // Save the movie
+        await saveMovie(movie);
+        setIsSaved(true);
+        Alert.alert('Saved!', `${movie.title} added to your watchlist`);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update watchlist. Please try again.');
+      console.error('Error toggling save:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const getPosterUrl = () => {
     if (!movie?.poster_path) {
@@ -178,16 +210,36 @@ const Details = () => {
         </View>
       </ScrollView>
 
-      <TouchableOpacity
-        style={styles.visitButton}
-        onPress={() => {
-          // Handle visit homepage action
-          router.push("/")
-        }}
-      >
-        <Text style={styles.visitButtonText}>Visit Homepage</Text>
-        <Text style={styles.arrowIcon}>→</Text>
-      </TouchableOpacity>
+      {/* Bottom Action Buttons */}
+      <View style={styles.bottomButtons}>
+        <TouchableOpacity
+          style={[styles.saveButton, isSaved && styles.saveButtonActive]}
+          onPress={handleSaveToggle}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <>
+              <Text style={styles.saveButtonIcon}>{isSaved ? '📑' : '🔖'}</Text>
+              <Text style={styles.saveButtonText}>
+                {isSaved ? 'Saved' : 'Save to Watchlist'}
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.visitButton}
+          onPress={() => {
+            // Handle visit homepage action
+            router.push("/")
+          }}
+        >
+          <Text style={styles.visitButtonText}>Visit Homepage</Text>
+          <Text style={styles.arrowIcon}>→</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -342,11 +394,37 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 20,
   },
-  visitButton: {
+  bottomButtons: {
     position: 'absolute',
     bottom: 20,
     left: 20,
     right: 20,
+    flexDirection: 'row',
+    gap: 12,
+  },
+  saveButton: {
+    flex: 1,
+    backgroundColor: '#AB8BFF',
+    borderRadius: 12,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  saveButtonActive: {
+    backgroundColor: '#FFB800',
+  },
+  saveButtonIcon: {
+    fontSize: 20,
+  },
+  saveButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  visitButton: {
+    flex: 1,
     backgroundColor: '#AB8BFF',
     borderRadius: 12,
     paddingVertical: 16,

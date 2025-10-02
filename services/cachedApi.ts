@@ -13,21 +13,23 @@ import { fetchMovies as fetchMoviesApi, fetchMovieDetails as fetchMovieDetailsAp
 /**
  * Fetch movies with caching
  * @param query - Search query (empty string for popular movies)
+ * @param page - Page number for pagination
  * @param forceRefresh - Skip cache and fetch fresh data
  */
 export const fetchMoviesCached = async (
   query: string,
+  page: number = 1,
   forceRefresh: boolean = false
 ): Promise<Movie[]> => {
   const cacheKey = query 
-    ? `${CACHE_KEYS.SEARCH_RESULTS}${query.toLowerCase()}`
-    : `${CACHE_KEYS.MOVIES}popular`;
+    ? `${CACHE_KEYS.SEARCH_RESULTS}${query.toLowerCase()}_page${page}`
+    : `${CACHE_KEYS.MOVIES}popular_page${page}`;
 
   const cacheDuration = query ? CACHE_DURATION.SEARCH : CACHE_DURATION.MOVIES;
 
   return fetchWithCache(
     cacheKey,
-    () => fetchMoviesApi({ query }),
+    () => fetchMoviesApi({ query, page }),
     cacheDuration,
     forceRefresh
   );

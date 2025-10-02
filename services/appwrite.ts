@@ -1,8 +1,9 @@
 import { Client, Databases, ID, Query } from "react-native-appwrite";
-import { fetchWithCache, CACHE_KEYS, CACHE_DURATION, removeCachedData } from './cacheService';
+import { fetchWithCache, CACHE_KEYS, CACHE_DURATION, removeCachedData, clearCacheByPrefix } from './cacheService';
 
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!;
 const COLLECTION_ID = process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID!;
+const SAVED_COLLECTION_ID = process.env.EXPO_PUBLIC_APPWRITE_SAVED_COLLECTION_ID!;
 
 const client = new Client()
   .setEndpoint("https://nyc.cloud.appwrite.io/v1")
@@ -118,4 +119,143 @@ export const getTrendingMovies = async (
     CACHE_DURATION.TRENDING,
     forceRefresh
   );
+};
+
+// ============================================
+// SAVED MOVIES / WATCHLIST FUNCTIONS
+// ============================================
+
+/**
+ * Save a movie to the watchlist
+ * @param movie - Movie data to save
+ */
+export const saveMovie = async (movie: Movie | MovieDetails): Promise<void> => {
+  try {
+    // Check if movie already saved
+    const existing = await database.listDocuments(DATABASE_ID, SAVED_COLLECTION_ID, [
+      Query.equal("movie_id", movie.id),
+    ]);
+
+    if (existing.documents.length > 0) {
+      console.log(`ℹ️ Movie "${movie.title}" is already saved`);
+      return;
+    }
+
+    // Handle both WatchMode (full URL) and TMDB (path) formats
+    const posterUrl = movie.poster_path?.startsWith('http')
+      ? movie.poster_path
+      : movie.poster_path 
+        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+        : '';
+
+    // Create new saved movie entry
+    await database.createDocument(DATABASE_ID, SAVED_COLLECTION_ID, ID.unique(), {
+      movie_id: movie.id,
+      title: movie.title,
+      poster_url: posterUrl,
+      saved_at: new Date().toISOString(),
+      vote_average: movie.vote_average || 0,
+      release_date: movie.release_date || '',
+    });
+
+    console.log(`✅ Saved movie: ${movie.title}`);
+
+    // Invalidate saved movies cache
+    await clearCacheByPrefix('saved_');
+  } catch (error) {
+    console.error("❌ Error saving movie:", error);
+    throw error;
+  }
+};
+
+/**
+ * Remove a movie from the watchlist
+ * @param movieId - Movie ID to remove
+ */
+export const unsaveMovie = async (movieId: number): Promise<void> => {
+  try {
+    const result = await database.listDocuments(DATABASE_ID, SAVED_COLLECTION_ID, [
+      Query.equal("movie_id", movieId),
+    ]);
+
+    if (result.documents.length > 0) {
+      await database.deleteDocument(
+        DATABASE_ID,
+        SAVED_COLLECTION_ID,
+        result.documents[0].$id
+      );
+      console.log(`🗑️ Removed movie ID ${movieId} from watchlist`);
+
+      // Invalidate saved movies cache
+      await clearCacheByPrefix('saved_');
+    }
+  } catch (error) {
+    console.error("❌ Error removing movie:", error);
+    throw error;
+  }
+};
+
+/**
+ * Check if a movie is saved in the watchlist
+ * @param movieId - Movie ID to check
+ * @returns true if saved, false otherwise
+ */
+export const isMovieSaved = async (movieId: number): Promise<boolean> => {
+  try {
+    const result = await database.listDocuments(DATABASE_ID, SAVED_COLLECTION_ID, [
+      Query.equal("movie_id", movieId),
+    ]);
+
+    return result.documents.length > 0;
+  } catch (error) {
+    console.error("❌ Error checking if movie is saved:", error);
+    return false;
+  }
+};
+
+/**
+ * Get all saved movies from the watchlist
+ * Uses caching to reduce database calls
+ * @param forceRefresh - Skip cache and fetch fresh data
+ * @returns Array of saved movies
+ */
+export const getSavedMovies = async (
+  forceRefresh: boolean = false
+): Promise<SavedMovie[]> => {
+  const fetchSaved = async (): Promise<SavedMovie[]> => {
+    try {
+      const result = await database.listDocuments(DATABASE_ID, SAVED_COLLECTION_ID, [
+        Query.orderDesc("saved_at"),
+        Query.limit(100),
+      ]);
+
+      console.log(`💾 Fetched ${result.documents.length} saved movies from database`);
+      
+      return result.documents as unknown as SavedMovie[];
+    } catch (error) {
+      console.error("❌ Error fetching saved movies:", error);
+      return [];
+    }
+  };
+
+  return fetchWithCache(
+    'saved_movies_list',
+    fetchSaved,
+    1000 * 60 * 5, // 5 minutes cache
+    forceRefresh
+  );
+};
+
+/**
+ * Get the count of saved movies
+ * @returns Number of saved movies
+ */
+export const getSavedMoviesCount = async (): Promise<number> => {
+  try {
+    const movies = await getSavedMovies();
+    return movies.length;
+  } catch (error) {
+    console.error("❌ Error getting saved movies count:", error);
+    return 0;
+  }
 };

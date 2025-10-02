@@ -23,12 +23,7 @@ const TAB_CONFIG = [
     icon: icons.save, 
     accessibilityLabel: "Saved Movies Tab"
   },
-  {
-    name: "profile",
-    title: "Profile",
-    icon: icons.person,
-    accessibilityLabel: "User Profile Tab"
-  }
+  
 ] as const;
 
 interface TabIconProps {

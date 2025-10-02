@@ -47,8 +47,10 @@ interface WatchModeDetailsResponse {
 
 export const fetchMovies = async ({
   query,
+  page = 1,
 }: {
   query: string;
+  page?: number;
 }): Promise<Movie[]> => {
   try {
     let endpoint: string;
@@ -57,8 +59,8 @@ export const fetchMovies = async ({
       // Use autocomplete search for better results
       endpoint = `${WATCHMODE_CONFIG.BASE_URL}/autocomplete-search/?apiKey=${WATCHMODE_CONFIG.API_KEY}&search_value=${encodeURIComponent(query)}&search_type=3`;
     } else {
-      // List popular movies
-      endpoint = `${WATCHMODE_CONFIG.BASE_URL}/list-titles/?apiKey=${WATCHMODE_CONFIG.API_KEY}&types=movie&sort_by=popularity_desc&limit=50`;
+      // List popular movies with pagination
+      endpoint = `${WATCHMODE_CONFIG.BASE_URL}/list-titles/?apiKey=${WATCHMODE_CONFIG.API_KEY}&types=movie&sort_by=popularity_desc&limit=50&page=${page}`;
     }
 
     const response = await fetch(endpoint, {
@@ -98,9 +100,16 @@ export const fetchMovies = async ({
       // List titles response format - need to fetch details for each
       const titles = data.titles || [];
       
-      // Fetch details for first 20 movies to get poster images
+      // Fetch details for movies to get poster images (limit based on page)
+      const itemsPerPage = 20;
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageTitles = titles.slice(0, itemsPerPage);
+      
+      console.log(`📄 Fetching page ${page} (${pageTitles.length} movies)`);
+      
       const detailedMovies = await Promise.all(
-        titles.slice(0, 20).map(async (item: any) => {
+        pageTitles.map(async (item: any) => {
           try {
             const detailsEndpoint = `${WATCHMODE_CONFIG.BASE_URL}/title/${item.id}/details/?apiKey=${WATCHMODE_CONFIG.API_KEY}`;
             const detailsResponse = await fetch(detailsEndpoint, {
