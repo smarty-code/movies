@@ -172,125 +172,7 @@
 
 ---
 
-## 🏗️ Architecture
 
-### Project Structure
-```
-movies/
-├── app/                      # Expo Router screens
-│   ├── (tabs)/              # Tab navigation group
-│   │   ├── index.tsx        # Home screen
-│   │   ├── search.tsx       # Search screen
-│   │   └── save.tsx         # Watchlist screen
-│   ├── movie/
-│   │   └── [id].tsx         # Dynamic movie details
-│   └── _layout.tsx          # Root layout
-│
-├── components/              # Reusable UI components
-│   ├── Container.tsx        # Safe area wrapper
-│   ├── MovieCard.tsx        # Movie card component
-│   ├── TrendingCard.tsx     # Trending movie card
-│   └── SearchBar.tsx        # Search input component
-│
-├── services/                # API and business logic
-│   ├── api.ts              # WatchMode API integration
-│   ├── cachedApi.ts        # Cached API wrappers
-│   ├── cacheService.ts     # Caching utilities
-│   ├── appwrite.ts         # Appwrite backend
-│   └── usefetch.ts         # Custom fetch hook
-│
-├── constants/               # App constants
-│   ├── icons.ts            # Icon imports
-│   └── images.ts           # Image imports
-│
-├── interfaces/              # TypeScript interfaces
-│   └── interfaces.d.ts     # Global type definitions
-│
-├── assets/                  # Static assets
-│   ├── icons/              # App icons
-│   ├── images/             # Images and graphics
-│   └── fonts/              # Custom fonts
-│
-└── DOCS/                    # Comprehensive documentation
-    ├── DOCUMENTATION.md
-    ├── CACHING_SYSTEM.md
-    ├── STYLE_GUIDE.md
-    └── ...
-```
-
-### Design Patterns
-
-#### 1. **Component Composition**
-```typescript
-// Reusable, composable components
-<Container>
-  <SearchBar onSearch={handleSearch} />
-  <MovieCard movie={movie} onPress={navigateToDetails} />
-</Container>
-```
-
-#### 2. **Custom Hooks**
-```typescript
-// Abstracted data fetching logic
-const { data, loading, error, refetch } = useFetch(() => 
-  fetchMoviesCached(searchQuery)
-);
-```
-
-#### 3. **Service Layer**
-```typescript
-// Separated API logic from UI
-services/
-  ├── api.ts           # Pure API calls
-  ├── cachedApi.ts     # Caching layer
-  └── appwrite.ts      # Backend logic
-```
-
-#### 4. **Type Safety**
-```typescript
-// Comprehensive TypeScript interfaces
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string | null;
-  vote_average: number;
-  // ... more fields
-}
-```
-
----
-
-## 🎨 Styling System
-
-### NativeWind Implementation
-This project uses **NativeWind v4** - Tailwind CSS for React Native
-
-```typescript
-// Tailwind classes in React Native
-<View className="flex-1 bg-[#0A0E27] px-4">
-  <Text className="text-xl font-bold text-white">
-    Popular Movies
-  </Text>
-</View>
-```
-
-### Custom Color Palette
-```javascript
-colors: {
-  primary: "#030014",      // Dark navy
-  secondary: "#151312",    // Dark gray
-  accent: "#AB8BFF",       // Purple accent
-  light: {
-    100: "#D6C7FF",        // Light purple
-    200: "#A8B5DB",        // Light blue
-    300: "#9CA4AB",        // Light gray
-  },
-  dark: {
-    100: "#221F3D",        // Dark purple
-    200: "#0F0D23",        // Darker purple
-  },
-}
-```
 
 ### Responsive Design
 - ✅ Percentage-based widths for grids
@@ -435,30 +317,7 @@ eas submit -p android
 
 ---
 
-## 🧪 Testing
 
-### Manual Testing Checklist
-- ✅ Home screen loads popular movies
-- ✅ Search returns relevant results
-- ✅ Movie details display correctly
-- ✅ Trending rankings update
-- ✅ Cache works on tab switching
-- ✅ Offline mode shows cached data
-- ✅ Error handling works properly
-
-### Test Commands
-```bash
-# Lint code
-npm run lint
-
-# Format code
-npm run format
-
-# Type check
-npx tsc --noEmit
-```
-
----
 
 ## 📝 Best Practices Followed
 
@@ -492,37 +351,7 @@ npx tsc --noEmit
 
 ---
 
-## 🛣️ Roadmap
 
-### Phase 1: Core Features ✅
-- [x] Movie browsing
-- [x] Search functionality
-- [x] Movie details
-- [x] Trending rankings
-- [x] Caching system
-
-### Phase 2: User Features 🚧
-- [ ] User authentication
-- [ ] Watchlist / favorites
-- [ ] User ratings
-- [ ] Watch history
-- [ ] Recommendations
-
-### Phase 3: Social Features 📅
-- [ ] User reviews
-- [ ] Share movies
-- [ ] Friend system
-- [ ] Activity feed
-- [ ] Comments
-
-### Phase 4: Advanced Features 🔮
-- [ ] Video trailers
-- [ ] Streaming links
-- [ ] Cast information
-- [ ] Similar movies
-- [ ] Push notifications
-
----
 
 ## 🤝 Contributing
 
@@ -553,9 +382,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Your Name**
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Name](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [@smarty-code](https://github.com/smarty-code)
+- LinkedIn: [Amit Pramanik](https://www.linkedin.com/in/amit-pramanik-/)
+
 
 ---
 
